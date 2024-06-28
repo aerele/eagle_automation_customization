@@ -1,0 +1,127 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format: JI - {import_file_type}: {creation}",
+ "creation": "2024-06-25 17:43:46.836092",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "import_details_section",
+  "company",
+  "journal_type",
+  "attach_file",
+  "status",
+  "column_break_nqrs",
+  "posting_date",
+  "import_file_type",
+  "skip_header",
+  "skip_total",
+  "section_break_ntuf",
+  "show_preview",
+  "preview",
+  "error_preview"
+ ],
+ "fields": [
+  {
+   "fieldname": "import_details_section",
+   "fieldtype": "Section Break",
+   "label": "Import Details"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "journal_type",
+   "fieldtype": "Select",
+   "label": "Journal Type",
+   "options": "Journal Entry\nInter Company Journal Entry\nBank Entry\nCash Entry\nCredit Card Entry\nDebit Note\nCredit Note\nContra Entry\nExcise Entry\nWrite Off Entry\nOpening Entry\nDepreciation Entry\nExchange Rate Revaluation\nExchange Gain Or Loss\nDeferred Revenue\nDeferred Expense"
+  },
+  {
+   "fieldname": "attach_file",
+   "fieldtype": "Attach",
+   "label": "Attach File"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Pending\nFailed\nPartially Imported\nImported"
+  },
+  {
+   "fieldname": "column_break_nqrs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "import_file_type",
+   "fieldtype": "Select",
+   "label": "Import File Type",
+   "options": "HTML\nTEXT"
+  },
+  {
+   "depends_on": "eval: doc.attach_file",
+   "fieldname": "skip_header",
+   "fieldtype": "Int",
+   "label": "Skip Header"
+  },
+  {
+   "depends_on": "eval: doc.attach_file",
+   "fieldname": "skip_total",
+   "fieldtype": "Int",
+   "label": "Skip Total"
+  },
+  {
+   "fieldname": "section_break_ntuf",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: doc.attach_file",
+   "fieldname": "show_preview",
+   "fieldtype": "Button",
+   "label": "Preview"
+  },
+  {
+   "fieldname": "preview",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "error_preview",
+   "fieldtype": "HTML",
+   "label": "Error Preview"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-06-28 15:35:50.725931",
+ "modified_by": "Administrator",
+ "module": "Eagle Automation Customization",
+ "name": "JV Import",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
