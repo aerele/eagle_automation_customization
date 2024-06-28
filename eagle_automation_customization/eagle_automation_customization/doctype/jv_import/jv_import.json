@@ -65,7 +65,7 @@
    "fieldname": "import_file_type",
    "fieldtype": "Select",
    "label": "Import File Type",
-   "options": "HTML\nTEXT"
+   "options": "TEXT\nHTML"
   },
   {
    "depends_on": "eval: doc.attach_file",
@@ -101,7 +101,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-28 15:35:50.725931",
+ "modified": "2024-06-28 18:07:59.109097",
  "modified_by": "Administrator",
  "module": "Eagle Automation Customization",
  "name": "JV Import",

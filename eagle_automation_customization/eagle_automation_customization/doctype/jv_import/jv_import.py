@@ -67,12 +67,12 @@ class JVImport(Document):
 						elif self.import_file_type == "TEXT":
 							account = ''
 							if acc_data[1]:
-								account = frappe.db.get_value("Account", {"account_name": ["like", acc_data[1]]}, "name")
+								account = frappe.db.get_value("Account", {"account_number": acc_data[1]}, "name")
 								if not account:
 									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system. Please create the account first.")
 
 							elif acc_data[2]:
-								account = frappe.db.get_value("Account", {"account_name": ["like", acc_data[2]]}, "name")
+								account = frappe.db.get_value("Account", {"account_number": acc_data[2]}, "name")
 								if not account:
 									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[2]}</b> not found in the system. Please create the account first.")
 							else:
