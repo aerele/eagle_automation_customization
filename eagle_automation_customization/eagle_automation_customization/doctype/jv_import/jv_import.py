@@ -55,10 +55,19 @@ class JVImport(Document):
 					for d in data:
 						acc_data = list(d.values())
 						if self.import_file_type == "HTML":
+							account = ''
+							if acc_data[1]:
+								account = frappe.db.get_value("Account", {"account_number": acc_data[1]}, "name")
+								if not account:
+									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system. Please create the account first.")
+							else:
+								frappe.log_error(reference_doctype="JV Import", reference_name=self.name, message=cstr(acc_data), title="JV Import Error")
+								raise frappe.exceptions.DoesNotExistError("Please provide a valid account for the transaction.")
+
 							jv.append("accounts",
 							{
 								"user_remark": acc_data[0],
-								"account": acc_data[1],
+								"account": account,
 								"debit": acc_data[2],
 								"debit_in_account_currency": acc_data[2],
 								"credit": acc_data[3],
@@ -301,7 +310,8 @@ class JVImport(Document):
 
 		elif self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() == 'xls':
 			#reading xls file using openpyxl engine
-			tables = pd.read_excel(file_path, engine='openpyxl')
+			tables =  pd.read_html(file_path, encoding=encoding)
+
 
 			# Extract data from the list of tables
 			_get_tables_data(tables)
