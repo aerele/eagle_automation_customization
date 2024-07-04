@@ -22,7 +22,6 @@ class JVImport(Document):
 		import_file_type: DF.Literal["HTML", "TEXT"]
 		journal_type: DF.Literal["Journal Entry", "Inter Company Journal Entry", "Bank Entry", "Cash Entry", "Credit Card Entry", "Debit Note", "Credit Note", "Contra Entry", "Excise Entry", "Write Off Entry", "Opening Entry", "Depreciation Entry", "Exchange Rate Revaluation", "Exchange Gain Or Loss", "Deferred Revenue", "Deferred Expense"]
 		posting_date: DF.Date | None
-		skip_header: DF.Int
 		skip_total: DF.Int
 		status: DF.Literal["Pending", "Failed", "Partially Imported", "Imported"]
 
@@ -35,11 +34,18 @@ class JVImport(Document):
 		try:
 			if self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() in ['xls', 'xlsx', 'csv']:
 				bulk_data = self.get_bulk_html_to_dict_list()
+			elif self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() not in ['xls', 'xlsx', 'csv']:
+				frappe.throw(title= "Invalid File Type", msg="Please select a ['xls', 'xlsx', 'csv', 'html'] file to import")
+
 			if self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() == 'html':
 				bulk_data =  [self.get_html_to_dict()]
-			elif self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower()  == "txt":
-				bulk_data =  [self.get_text_to_dict()]
+			elif self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() not in ['html','xls', 'xlsx', 'csv']:
+				frappe.throw(title= "Invalid File Type", msg="Please select a HTML file to import")
 
+			if self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower()  == "txt":
+				bulk_data =  [self.get_text_to_dict()]
+			elif self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower() not in ['txt']:
+				frappe.throw(title="Invalid File Type", msg="Please select a TEXT file to import")
 
 			if not bulk_data: return
 
@@ -115,10 +121,18 @@ class JVImport(Document):
 		bulk_data = []
 		if self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() in ['xls', 'xlsx', 'csv']:
 			bulk_data = self.get_bulk_html_to_dict_list()
+		elif self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() not in ['xls', 'xlsx', 'csv']:
+			frappe.throw(title= "Invalid File Type", msg="Please select a ['xls', 'xlsx', 'csv', 'html'] file to import")
+
 		if self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() == 'html':
 			bulk_data =  [self.get_html_to_dict()]
-		elif self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower()  == "txt":
+		elif self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() not in ['html', 'xls', 'xlsx', 'csv']:
+			frappe.throw(title= "Invalid File Type", msg="Please select a HTML file to import")
+
+		if self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower()  == "txt":
 			bulk_data =  [self.get_text_to_dict()]
+		elif self.import_file_type == "TEXT" and self.attach_file.split('.')[-1].lower() not in ['txt']:
+			frappe.throw(title="Invalid File Type", msg="Please select a TEXT file to import")
 
 		if not bulk_data: return
 
@@ -187,9 +201,10 @@ class JVImport(Document):
 		soup = BeautifulSoup(html, 'html.parser')
 
 		# Extract headers from the first two rows and concatenate their values
-		header_rows = soup.find_all('tr')[:self.skip_header]
+		skip_header = self.no_of_rows if self.exclude_header and self.no_of_rows else 0
+		header_rows = soup.find_all('tr')[:skip_header]
 		self.headers = []
-		if self.skip_header:
+		if skip_header:
 			for col1, col2 in zip(header_rows[0].find_all('td'), header_rows[1].find_all('td')):
 				header = col1.get_text(strip=True).replace(':', '') + ' ' + col2.get_text(strip=True)
 				self.headers.append(header.strip())
@@ -231,18 +246,42 @@ class JVImport(Document):
 		# Split the text into rows
 		rows = text.split('\n')
 
+		skip_header = 0
 		# Extract headers from the first row
-		if self.skip_header:
-			headers = rows[0].split('\t')
-			headers = [header.strip() for header in headers]
+		if self.exclude_header and self.no_of_rows:
+			skip_header = self.no_of_rows
+			if len(rows) <= self.no_of_rows:
+				frappe.throw(title ="No Data Found",msg="No data found in the file. Please check the file format and try again.")
+			columns_count = len(rows[0].split('\t'))
+			header_columns = [[row for row in rows[0].split('\t') if row.strip()]]
+			for header in rows[1:self.no_of_rows]:
+				if len(header.split('\t')) <= columns_count:
+					try:
+						header_columns.append([str(head1) + " " +str(head2) for head1, head2 in zip(header_columns[-1], header.split('\t'))])
+					except:
+						c = len(header.split('\t'))
+						inv_head = [str(head1) + " " +str(head2) for head1, head2 in zip(header_columns[-1][:c], header.split('\t'))]
+						header_columns[-1][:len(inv_head)] = inv_head
+				else:
+					header_columns.append([str(head1) + " " +str(head2) for head1, head2 in zip(header_columns[-1], header.split('\t'))])
+
+			headers = header_columns[-1]
 		else:
 			headers = ['Date', 'Account(Dr)', 'Account(Cr)', 'Description1', 'Description2', 'Amount']
 
 		# Extract data rows
 		data = []
-		for row in rows[self.skip_header:]:
+		for row in rows[skip_header:]:
 			cols = row.split('\t')
-			row_data = [col.strip() for col in cols]
+			if len(cols) == len(headers):
+				row_data = [col.strip() for col in cols]
+			elif len(cols) < len(headers):
+				empty_cols = [' ' for c in range(len(headers) - len(cols))]
+				row_data = [col.strip() for col in cols] + empty_cols
+			else:
+				len_head = len(headers)
+				row_data = [col.strip() for col in cols[:len_head]]
+
 			if row_data and not row_data[0]:
 				continue
 			data.append(row_data)
@@ -284,7 +323,8 @@ class JVImport(Document):
 				df.columns = df.iloc[1]
 
 				# Drop the first two rows since they are headers and empty rows
-				df = df.drop([0, 1])
+				header_rows = list(range(self.no_of_rows)) if self.exclude_header and self.no_of_rows else [0, 1]
+				df = df.drop(header_rows)
 
 				# Reset the index
 				df.reset_index(drop=True, inplace=True)
@@ -298,7 +338,7 @@ class JVImport(Document):
 							row[key] = 0
 
 				if data_list:
-					data.append(data_list[:(-self.skip_total) or len(data_list)])
+					data.append(data_list[:(-1) or len(data_list)])
 
 		if self.import_file_type == "HTML" and self.attach_file.split('.')[-1].lower() == 'csv':
 			tables =  pd.read_html(file_path, encoding=encoding)

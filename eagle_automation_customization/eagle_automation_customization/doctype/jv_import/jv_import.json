@@ -14,8 +14,8 @@
   "column_break_nqrs",
   "posting_date",
   "import_file_type",
-  "skip_header",
-  "skip_total",
+  "exclude_header",
+  "no_of_rows",
   "section_break_ntuf",
   "show_preview",
   "preview",
@@ -68,18 +68,6 @@
    "options": "TEXT\nHTML"
   },
   {
-   "depends_on": "eval: doc.attach_file",
-   "fieldname": "skip_header",
-   "fieldtype": "Int",
-   "label": "Skip Header"
-  },
-  {
-   "depends_on": "eval: doc.attach_file",
-   "fieldname": "skip_total",
-   "fieldtype": "Int",
-   "label": "Skip Total"
-  },
-  {
    "fieldname": "section_break_ntuf",
    "fieldtype": "Section Break"
   },
@@ -97,11 +85,26 @@
    "fieldname": "error_preview",
    "fieldtype": "HTML",
    "label": "Error Preview"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval: doc.attach_file",
+   "fieldname": "exclude_header",
+   "fieldtype": "Check",
+   "label": "Exclude Header"
+  },
+  {
+   "default": "2",
+   "depends_on": "eval: doc.attach_file && doc.exclude_header",
+   "fieldname": "no_of_rows",
+   "fieldtype": "Int",
+   "label": "No of rows",
+   "mandatory_depends_on": "eval: doc.attach_file && doc.exclude_header"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-06-28 18:07:59.109097",
+ "modified": "2024-07-04 18:46:08.044884",
  "modified_by": "Administrator",
  "module": "Eagle Automation Customization",
  "name": "JV Import",

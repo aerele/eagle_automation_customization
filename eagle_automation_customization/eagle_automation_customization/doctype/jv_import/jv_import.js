@@ -41,10 +41,21 @@ frappe.ui.form.on("JV Import", {
                 });
             }
         })
+
+        frm.trigger('show_preview')
     },
+
     show_preview: function(frm) {
         frm.call("preview_data").then(r => {
             cur_frm.get_field('preview').$wrapper.html(r.message)
         })
+    },
+    exclude_header(frm){
+        if(frm.doc.import_file_type == 'HTML'){
+            frm.set_value("no_of_rows", 2)
+        }else{
+            frm.set_value("no_of_rows", 0)
+        }
     }
+
 });
