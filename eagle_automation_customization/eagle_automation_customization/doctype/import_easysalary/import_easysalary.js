@@ -1,7 +1,7 @@
 // Copyright (c) 2024, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on("JV Import", {
+frappe.ui.form.on("Import easySalary", {
 	refresh(frm) {
         frm.add_custom_button(__('Start Import'), function() {
             frm.call("import_data").then(r => {

@@ -11,7 +11,7 @@ import chardet
 
 from frappe.utils import cstr
 
-class JVImport(Document):
+class ImporteasySalary(Document):
 	from typing import TYPE_CHECKING
 
 	if TYPE_CHECKING:
@@ -67,7 +67,7 @@ class JVImport(Document):
 								if not account:
 									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system. Please create the account first.")
 							else:
-								frappe.log_error(reference_doctype="JV Import", reference_name=self.name, message=cstr(acc_data), title="JV Import Error")
+								frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=cstr(acc_data), title="Import easySalary Error")
 								raise frappe.exceptions.DoesNotExistError("Please provide a valid account for the transaction.")
 
 							jv.append("accounts",
@@ -91,7 +91,7 @@ class JVImport(Document):
 								if not account:
 									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[2]}</b> not found in the system. Please create the account first.")
 							else:
-								frappe.log_error(reference_doctype="JV Import", reference_name=self.name, message=cstr(acc_data), title="JV Import Error")
+								frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=cstr(acc_data), title="Import easySalary Error")
 								raise frappe.exceptions.DoesNotExistError("Please provide a valid account for the transaction.")
 
 							jv.append("accounts",
@@ -105,14 +105,14 @@ class JVImport(Document):
 							})
 					jv.insert(ignore_mandatory=True, ignore_permissions=True, ignore_links=True)
 				except:
-					frappe.log_error(reference_doctype="JV Import", reference_name=self.name, message=frappe.get_traceback(), title="JV Import Error")
+					frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=frappe.get_traceback(), title="Import easySalary Error")
 					self.db_set("status", "Partially Imported")
 				else:
 					import_count += 1
 					self.db_set("status", "Imported")
 					
 		except Exception as e:
-			frappe.log_error(reference_doctype="JV Import", reference_name=self.name, message=frappe.get_traceback(), title="JV Import Fail")
+			frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=frappe.get_traceback(), title="Import easySalary Fail")
 			self.db_set("status", "Failed")
 
 	@frappe.whitelist()
@@ -361,7 +361,7 @@ class JVImport(Document):
 	@frappe.whitelist()
 	def preview_error_log(self):
 		html = ""
-		for data in frappe.db.get_all('Error Log', filters={'reference_doctype': 'JV Import', 'reference_name': self.name}, fields=['error']):
+		for data in frappe.db.get_all('Error Log', filters={'reference_doctype': 'Import easySalary', 'reference_name': self.name}, fields=['error']):
 			html +=  get_preview_from_template(data)
 		return html
 			

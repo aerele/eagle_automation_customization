@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestJVImport(FrappeTestCase):
+class TestImporteasySalary(FrappeTestCase):
 	pass
