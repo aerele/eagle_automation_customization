@@ -63,9 +63,9 @@ class ImporteasySalary(Document):
 						if self.import_file_type == "HTML":
 							account = ''
 							if acc_data[1]:
-								account = frappe.db.get_value("Account", {"account_number": acc_data[1]}, "name")
+								account = frappe.db.get_value("Account", {"account_number": acc_data[1], 'company': self.company}, "name")
 								if not account:
-									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system. Please create the account first.")
+									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system for comapny {self.company}. Please create the account first.")
 							else:
 								frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=cstr(acc_data), title="Import easySalary Error")
 								raise frappe.exceptions.DoesNotExistError("Please provide a valid account for the transaction.")
@@ -82,14 +82,14 @@ class ImporteasySalary(Document):
 						elif self.import_file_type == "TEXT":
 							account = ''
 							if acc_data[1]:
-								account = frappe.db.get_value("Account", {"account_number": acc_data[1]}, "name")
+								account = frappe.db.get_value("Account", {"account_number": acc_data[1], 'company': self.company}, "name")
 								if not account:
-									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> not found in the system. Please create the account first.")
+									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[1]}</b> for the company <b>{self.company}</b> not found in the system. Please create the account first.")
 
 							elif acc_data[2]:
-								account = frappe.db.get_value("Account", {"account_number": acc_data[2]}, "name")
+								account = frappe.db.get_value("Account", {"account_number": acc_data[2], 'company': self.company}, "name")
 								if not account:
-									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[2]}</b> not found in the system. Please create the account first.")
+									raise frappe.exceptions.DoesNotExistError(f"Account <b>{acc_data[2]}</b> for the company <b>{self.company}</b> not found in the system. Please create the account first.")
 							else:
 								frappe.log_error(reference_doctype="Import easySalary", reference_name=self.name, message=cstr(acc_data), title="Import easySalary Error")
 								raise frappe.exceptions.DoesNotExistError("Please provide a valid account for the transaction.")
